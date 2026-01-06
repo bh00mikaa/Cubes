@@ -11,10 +11,10 @@ ini_set('display_errors', 0); // Set to 0 in production
 date_default_timezone_set('Asia/Kolkata');
 
 // Database credentials 
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'zmufdzmy_vistech_residencetest');
-define('DB_PASSWORD', 'Vistechtest@123');
-define('DB_NAME', 'zmufdzmy_vistech_residence');
+define('DB_SERVER');
+define('DB_USERNAME');
+define('DB_PASSWORD');
+define('DB_NAME');
 
 // Create connection
 $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
