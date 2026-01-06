@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Keyless Cubes - Touchscreen Kiosk</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .admin-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      border: none;
+      z-index: 1000;
+    }
+
+    .admin-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .admin-button:active {
+      transform: scale(0.95);
+    }
+
+    .admin-button i {
+      color: white;
+      font-size: 24px;
+    }
+
+    .admin-button-tooltip {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .admin-button:hover .admin-button-tooltip {
+      opacity: 1;
+    }
+    
+    .size-availability {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    
+    .availability-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .availability-badge.available {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .availability-badge.limited {
+      background: linear-gradient(135deg, #fff3cd, #ffeeba);
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+    
+    .availability-badge.unavailable {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .availability-badge i {
+      font-size: 0.9rem;
+    }
+    
+    .size-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #f5f5f5;
+      border-color: #ddd;
+    }
+    
+    .size-btn:disabled:hover {
+      transform: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .size-btn:disabled .availability-badge {
+      opacity: 1;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .fa-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    #selectedResidentNameDisplay {
+      transition: all 0.3s ease;
+    }
+
+    .info-box.highlight span {
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .info-box.highlight span[id*="Display"] {
+      font-size: 1.05em;
+    }
+    .chatbot-widget {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 999;
+    }
+    
+    .chatbot-toggle {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #1a1a2e, #16213e); 
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
+        transition: all 0.3s ease;
+        border: none;
+        color: white;
+        font-size: 24px;
+    }
+    
+    .chatbot-toggle:hover {
+        transform: scale(1.1); /* Same as admin button */
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4); /* Same as admin button */
+    }
+    
+    .chatbot-toggle:active {
+        transform: scale(0.95); /* Same as admin button */
+    }
+    
+    .chatbot-toggle.active {
+        background: linear-gradient(135deg, #16213e, #0f172a);
+    }
+    
+    .chatbot-toggle i {
+        color: white;
+        font-size: 24px;
+    }
+    
+    .chatbot-container {
+        position: fixed;
+        bottom: 90px;
+        left: 20px; 
+        width: 380px;
+        height: 600px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 998;
+        animation: slideUp 0.3s ease-out;
+    }
+    
+    .chatbot-container.active {
+        display: flex;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .chatbot-header {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: white;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chatbot-header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .chatbot-avatar {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .chatbot-header-info h3 {
+        font-size: 1.15rem;
+        margin: 0;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        letter-spacing: 0.3px;
+    }
+    
+    .chatbot-header-info p {
+        font-size: 0.8rem;
+        margin: 4px 0 0 0;
+        opacity: 0.85;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .chatbot-header-info p::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.6;
+            transform: scale(0.9);
+        }
+    }
+    
+    .chatbot-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .chatbot-close:hover {
+        opacity: 1;
+    }
+    
+    .chatbot-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .chatbot-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .chatbot-messages::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    
+    .message {
+        display: flex;
+        gap: 10px;
+        animation: messageSlide 0.3s ease-out;
+    }
+    
+    @keyframes messageSlide {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .message.user {
+        flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 14px;
+    }
+    
+    .message.bot .message-avatar {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: white;
+    }
+    
+    .message.user .message-avatar {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+    
+    .message-content {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 14px;
+        line-height: 1.5;
+        font-size: 0.9rem;
+    }
+    
+    .message.bot .message-content {
+        background: white;
+        color: #1e293b;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .message.user .message-content {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message-content ul {
+        margin: 8px 0;
+        padding-left: 20px;
+    }
+    
+    .message-content li {
+        margin: 6px 0;
+    }
+    
+    .message-content strong {
+        font-weight: 600;
+    }
+    
+    .quick-questions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    
+    .quick-question {
+        padding: 8px 14px;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        color: #334155;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+    
+    .quick-question:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+        transform: translateY(-1px);
+    }
+    
+    .welcome-message {
+        text-align: center;
+        padding: 30px 20px;
+    }
+    
+    .welcome-message i {
+        font-size: 40px;
+        color: #2563eb;
+        margin-bottom: 12px;
+    }
+    
+    .welcome-message h3 {
+        font-size: 1.2rem;
+        color: #1e293b;
+        margin: 0 0 8px 0;
+    }
+    
+    .welcome-message p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0 0 20px 0;
+    }
+    
+    .typing-indicator {
+        display: flex;
+        gap: 6px;
+        padding: 12px 16px;
+        background: white;
+        border-radius: 14px;
+        border-bottom-left-radius: 4px;
+        width: fit-content;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #64748b;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.7;
+        }
+        30% {
+            transform: translateY(-8px);
+            opacity: 1;
+        }
+    }
+    
+    .chatbot-input {
+        padding: 16px 20px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+        font-family: inherit;
+    }
+    
+    .chatbot-input input:focus {
+        border-color: #2563eb;
+    }
+    
+    .chatbot-send {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+    }
+    
+    .chatbot-send:hover:not(:disabled) {
+        transform: scale(1.1);
+    }
+    
+    .chatbot-send:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .chatbot-widget {
+            left: 20px;
+            bottom: 90px;
+        }
+        
+        .chatbot-container {
+            width: calc(100vw - 40px);
+            height: 70vh;
+            bottom: 160px;
+            left: 20px;
+        }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .btn-warning {
+      background: linear-gradient(135deg, #f39c12, #e67e22);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    .btn-warning:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+    }
+    
+    .btn-warning:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .success-message {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      border-left: 4px solid #28a745;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #155724;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    .success-message i {
+      color: #28a745;
+      margin-right: 8px;
+    }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="page-loader" id="pageLoader">
+      <div class="loader-bubble">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+    </div>
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">KC</div>
+        <div class="title">
+          <div class="name">Keyless Cubes</div>
+          <div class="sub">Secure Delivery System</div>
+        </div>
+      </div>
+      <div class="topbar-info">
+        <div class="main">24/7 Service</div>
+        <div class="sub">Contactless & Secure</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- MENU SCREEN -->
+      <div id="menuScreen" class="screen active">
+        <div class="card">
+          <div class="card-inner">
+            <div class="section-header">
+              <h1>AUTHENTIC ENGINEERS</h1>
+              <p>Select your service below to continue</p>
+            </div>
+            <div class="main-menu">
+              <button class="menu-card deliver" onclick="showScreen('deliverStep1')">
+                <div class="icon"><i class="fas fa-box"></i></div>
+                <h2>Deposit Package</h2>
+                <p>For Delivery Personnel</p>
+              </button>
+              <button class="menu-card collect" onclick="showScreen('collectTowerScreen')">
+                <div class="icon"><i class="fas fa-box-open"></i></div>
+                <h2>Collect Package</h2>
+                <p>For Residents</p>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVER STEP 1 - SELECT TOWER -->
+      <div id="deliverStep1" class="screen">
+        <div class="card">
+          <div class="card-inner">
+            <div class="progress-bar">
+              <div class="progress-step active">
+                <div class="circle">1</div>
+                <p>Select Tower</p>
+              </div>
+              <div class="progress-step">
+                <div class="circle">2</div>
+                <p>Select Flat</p>
+              </div>
+              <div class="progress-step">
+                <div class="circle">3</div>
+                <p>Package Details</p>
+              </div>
+              <div class="progress-step">
+                <div class="circle">4</div>
+                <p>Confirm</p>
+              </div>
+            </div>
+            <div class="section-header">
+              <h1>Select Tower</h1>
+              <p>Choose the tower for delivery</p>
+            </div>
+            <div id="towerLayout" class="building-layout"></div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="showScreen('menuScreen')">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVER STEP 2 - SELECT APARTMENT -->
+      <div id="deliverStep2" class="screen">
+        <div class="card">
+          <div class="card-inner">
+            <div class="progress-bar">
+              <div class="progress-step completed">
+                <div class="circle"><i class="fas fa-check"></i></div>
+                <p>Select Tower</p>
+              </div>
+              <div class="progress-step active">
+                <div class="circle">2</div>
+                <p>Select Flat</p>
+              </div>
+              <div class="progress-step">
+                <div class="circle">3</div>
+                <p>Package Details</p>
+              </div>
+              <div class="progress-step">
+                <div class="circle">4</div>
+                <p>Confirm</p>
+              </div>
+            </div>
+            <div class="section-header">
+              <h1>Select Apartment</h1>
+              <p>Tap the apartment number to continue</p>
+            </div>
+            <div class="info-box highlight">
+              <p><strong>Selected Tower:</strong> <span id="selectedTowerDisplay">-</span></p>
+            </div>
+            <div id="buildingLayout" class="building-layout"></div>
+            <div class="button-group" id="step2ButtonGroup">
+              <button type="button" class="btn btn-secondary" onclick="showScreen('deliverStep1')">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" id="step2NextBtn" disabled onclick="goToStep3()">
+                Continue <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVER STEP 3 - PACKAGE DETAILS -->
+      <div id="deliverStep3" class="screen">
+        <div class="card">
+          <div class="card-inner">
+            <div class="progress-bar">
+              <div class="progress-step completed">
+                <div class="circle"><i class="fas fa-check"></i></div>
+                <p>Select Tower</p>
+              </div>
+              <div class="progress-step completed">
+                <div class="circle"><i class="fas fa-check"></i></div>
+                <p>Select Flat</p>
+              </div>
+              <div class="progress-step active">
+                <div class="circle">3</div>
+                <p>Package Details</p>
+              </div>
+              <div class="progress-step">
+                <div class="circle">4</div>
+                <p>Confirm</p>
+              </div>
+            </div>
+            <div class="section-header">
+              <h1>Package Details</h1>
+              <p>Enter package information below</p>
+            </div>
+            <div class="info-box highlight">
+              <p><strong>Tower:</strong> <span id="selectedTowerDisplay2">-</span></p>
+              <p><strong>Apartment:</strong> <span id="selectedFlatDisplay">-</span></p>
+              <p><strong>Resident:</strong> <span id="selectedResidentNameDisplay">loading...</span></p>
+            </div>
+            <form id="step2Form">
+              <div class="form-group" id="sizeSection">
+                <label>Package Size *</label>
+                <div class="size-grid">
+                  <button type="button" class="size-btn" data-size="small" id="size-small-btn" onclick="selectSize('small', this)">
+                    <div class="size-icon">📦</div>
+                    <div class="size-name">Small</div>
+                    <div class="size-desc">30x30x40 cm</div>
+                    <div class="size-example">Documents, Small Items</div>
+                    <div class="size-availability">
+                      <span class="availability-badge" id="small-availability">
+                        <i class="fas fa-spinner fa-spin"></i>
+                      </span>
+                    </div>
+                  </button>
+                  
+                  <button type="button" class="size-btn" data-size="medium" id="size-medium-btn" onclick="selectSize('medium', this)">
+                    <div class="size-icon">📫</div>
+                    <div class="size-name">Medium</div>
+                    <div class="size-desc">40x40x60 cm</div>
+                    <div class="size-example">Shoes, Books, Groceries</div>
+                    <div class="size-availability">
+                      <span class="availability-badge" id="medium-availability">
+                        <i class="fas fa-spinner fa-spin"></i>
+                      </span>
+                    </div>
+                  </button>
+                  
+                  <button type="button" class="size-btn" data-size="large" id="size-large-btn" onclick="selectSize('large', this)">
+                    <div class="size-icon">📮</div>
+                    <div class="size-name">Large</div>
+                    <div class="size-desc">50x50x80 cm</div>
+                    <div class="size-example">Electronics, Large Boxes</div>
+                    <div class="size-availability">
+                      <span class="availability-badge" id="large-availability">
+                        <i class="fas fa-spinner fa-spin"></i>
+                      </span>
+                    </div>
+                  </button>
+                </div>
+                <input type="hidden" id="packageSize" required>
+              </div>
+              <div class="form-group" id="trackingSection">
+                <label for="trackingNumber">Tracking Number (Optional)</label>
+                <input type="text" id="trackingNumber" name="trackingNumber" placeholder="Tracking ID">
+              </div>
+              <div class="form-group" id="companySection">
+                <label>Delivery Company *</label>
+                <div class="company-grid">
+                  <button type="button" class="company-btn selected" data-company="Amazon" onclick="selectCompany('Amazon', this)">
+                    <div class="company-name">Amazon</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="Flipkart" onclick="selectCompany('Flipkart', this)">
+                    <div class="company-name">Flipkart</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="Swiggy" onclick="selectCompany('Swiggy', this)">
+                    <div class="company-name">Swiggy</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="Zomato" onclick="selectCompany('Zomato', this)">
+                    <div class="company-name">Zomato</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="BlueDart" onclick="selectCompany('BlueDart', this)">
+                    <div class="company-name">BlueDart</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="Delhivery" onclick="selectCompany('Delhivery', this)">
+                    <div class="company-name">Delhivery</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="DTDC" onclick="selectCompany('DTDC', this)">
+                    <div class="company-name">DTDC</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="FedEx" onclick="selectCompany('FedEx', this)">
+                    <div class="company-name">FedEx</div>
+                  </button>
+                  <button type="button" class="company-btn" data-company="Other" onclick="selectCompany('Other', this)">
+                    <div class="company-name">Other</div>
+                  </button>
+                </div>
+                <input type="hidden" id="deliveryCompany" value="Amazon">
+              </div>
+              <div class="button-group">
+                <button type="button" class="btn btn-secondary" onclick="showScreen('deliverStep2')">
+                  <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  Deposit Package <i class="fas fa-check"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- COLLECT TOWER SELECT -->
+      <div id="collectTowerScreen" class="screen">
+        <div class="card">
+          <div class="card-inner">
+            <div class="section-header">
+              <h1>Select Tower</h1>
+              <p>Choose your tower to view active deliveries</p>
+            </div>
+            <div id="collectTowerLayout" class="building-layout"></div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="showScreen('menuScreen')">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLLECT STEP 1 - SELECT APARTMENT -->
+      <div id="collectStep1" class="screen">
+        <div class="card">
+          <div class="card-inner">
+            <div class="section-header">
+              <h1>Select Your Apartment</h1>
+              <p>Choose your apartment to collect package</p>
+            </div>
+            <div class="info-box highlight">
+              <p><i class="fas fa-info-circle"></i> Only apartments with active deliveries are shown</p>
+            </div>
+            <div id="collectBuildingLayout" class="building-layout">
+              <div style="text-align:center;padding:40px 20px;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--primary)"></i>
+                <p style="margin-top:20px;color:var(--text-muted)">Loading active deliveries...</p>
+              </div>
+            </div>
+            <div class="button-group" id="collectStep1ButtonGroup">
+              <button type="button" class="btn btn-secondary" onclick="showScreen('collectTowerScreen')">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" id="collectStep1NextBtn" disabled onclick="goToCollectStep2()">
+                Continue <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLLECT STEP 2 - ENTER OTP -->
+      <div id="collectStep2" class="screen">
+      <div class="card">
+        <div class="card-inner">
+          <div class="section-header">
+            <h1>Collect Package</h1>
+            <p>Enter your credentials to collect package</p>
+          </div>
+          <div class="info-box highlight">
+            <p><strong>Selected Apartment:</strong> <span id="selectedCollectFlatDisplay">-</span></p>
+          </div>
+          
+          <form id="collectForm">
+            <div class="form-group">
+              <label for="collectResidentName">Full Name *</label>
+              <input type="text" id="collectResidentName" placeholder="Enter your full name" required>
+              <p class="hint-text"><i class="fas fa-user"></i> Enter your name as registered</p>
+            </div>
+            <div class="form-group">
+              <label for="collectMobile">Mobile Number *</label>
+              <input type="number" id="collectMobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" pattern="[0-9]*" required>
+              <p class="hint-text"><i class="fas fa-mobile-alt"></i> Enter the mobile number registered with your apartment</p>
+            </div>
+            <div class="form-group">
+              <label for="otpInput">Enter OTP *</label>
+              <input type="number" id="otpInput" class="otp-input" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" required>
+              <p class="hint-text"><i class="fas fa-info-circle"></i> Check your Email for the 6-digit code</p>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="showScreen('collectStep1')">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Collect Package <i class="fas fa-box-open"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+      <!-- COLLECTION SUCCESS SCREEN -->
+      <div id="lockerOpenedScreen" class="screen">
+        <div class="card">
+          <div class="card-inner result-screen">
+            <div class="result-icon success"><i class="fas fa-box-open"></i></div>
+            <h2>Collection Request Sent!</h2>
+            <div class="info-box success-highlight">
+              <p><strong>Locker Number:</strong> <span id="openedLockerNumber">-</span></p>
+              <p><strong>Apartment:</strong> <span id="openedApartment">-</span></p>
+              <p><strong>Location:</strong> <span id="openedLocation">-</span></p>
+              <p style="margin-top:20px;color:#27ae60;font-weight:700;font-size:1.15rem">
+                <i class="fas fa-check-circle"></i> <span id="openedInstruction">Please proceed to collect your package from the locker.</span>
+              </p>
+            </div>
+            <div class="button-group" style="margin-top:32px">
+              <button class="btn btn-success" onclick="showScreen('menuScreen')">
+                <i class="fas fa-home"></i> Return to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEPOSIT SUCCESS SCREEN -->
+      <div id="successScreen" class="screen">
+        <div class="card">
+          <div class="card-inner result-screen">
+            <div class="result-icon success"><i class="fas fa-check"></i></div>
+            <h2 id="successTitle">Package Deposited Successfully</h2>
+            <div id="successDetails" class="info-box"></div>
+            <button class="btn btn-primary" onclick="showScreen('menuScreen')" style="margin-top:28px">
+              <i class="fas fa-home"></i> Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ERROR SCREEN -->
+      <div id="errorScreen" class="screen">
+        <div class="card">
+          <div class="card-inner result-screen">
+            <div class="result-icon error"><i class="fas fa-exclamation-triangle"></i></div>
+            <h2>Error</h2>
+            <p id="errorMessage" style="font-size:1.05rem;margin:20px 0;color:var(--text-muted);max-width:480px;line-height:1.6"></p>
+            <button class="btn btn-primary" onclick="goBack()" style="margin-top:28px">
+              <i class="fas fa-arrow-left"></i> Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chatbot-widget">
+    <!-- Chatbot Toggle Button -->
+    <button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-header-left">
+                <div class="chatbot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chatbot-header-info">
+                    <h3>Support Assistant</h3>
+                    <p>Online • Ready to help</p>
+                </div>
+            </div>
+            <button class="chatbot-close" onclick="toggleChatbot()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="welcome-message">
+                <i class="fas fa-robot"></i>
+                <h3>Welcome to Keyless Cubes!</h3>
+                <p>How can I assist you today?</p>
+                <div class="quick-questions">
+                    <button class="quick-question" onclick="askQuestion('How do I deposit a package?')">
+                        📦 Deposit Process
+                    </button>
+                    <button class="quick-question" onclick="askQuestion('How do I collect my package?')">
+                        📭 Collection Process
+                    </button>
+                    <button class="quick-question" onclick="askQuestion('What if I forgot my OTP?')">
+                        🔐 Forgot OTP
+                    </button>
+                    <button class="quick-question" onclick="askQuestion('What are the locker sizes?')">
+                        📏 Locker Sizes
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-input">
+            <input 
+                type="text" 
+                id="chatbotInput" 
+                placeholder="Type your question..." 
+                autocomplete="off"
+            />
+            <button class="chatbot-send" id="chatbotSend" onclick="sendChatMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- Admin Button -->
+    <button class="admin-button" onclick="goToAdminLogin()">
+      <i class="fas fa-user-shield"></i>
+      <div class="admin-button-tooltip">Admin Login</div>
+    </button>
+  </div>
+  
+  <script>
+    const API_BASE = '/keyless/api/deposit_delivery.php';
+    const API_COLLECT = '/keyless/api/collect_delivery.php';
+    
+    let currentScreen = 'menuScreen';
+    let previousScreen = 'menuScreen';
+    let selectedTower = null;
+    let selectedTowerName = '';
+    let selectedFlat = '';
+    let selectedCollectFlat = '';
+    let towersData = [];
+    let flatsData = [];
+    let activeDeliveryFlats = [];
+    let selectedResidentDetails = null;
+    let autoRedirectTimeout = null;
+    let selectedPackageSize = '';
+    let selectedDeliveryCompany = 'Amazon';
+    let activeDeliveriesCache = {};
+    let cacheTimestamp = 0;
+    const CACHE_DURATION = 2000;
+    
+    let lockerAvailability = {
+      small: { available: 0, total: 0 },
+      medium: { available: 0, total: 0 },
+      large: { available: 0, total: 0 }
+    };
+    
+    function goToAdminLogin() {
+      window.location.href = 'admin_login.html';
+    }
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(frequency, duration, type = 'sine') {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.value = frequency;
+      oscillator.type = type;
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playSuccessSound() {
+      playSound(800, 0.1, 'sine');
+      setTimeout(() => playSound(1000, 0.15, 'sine'), 100);
+    }
+
+    function playErrorSound() {
+      playSound(200, 0.3, 'square');
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTowers();
+      setTimeout(() => {
+        const loader = document.getElementById('pageLoader');
+        if(loader) {
+          loader.style.transition = 'opacity 360ms ease';
+          loader.style.opacity = '0';
+          setTimeout(() => loader.remove(), 420);
+        }
+      }, 500);
+    });
+
+    async function loadTowers() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(`${API_BASE}?action=get_towers`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        const text = await response.text();
+        let result;
+        
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error('API Response (not JSON):', text);
+          throw new Error('Server returned invalid response. Check console for details.');
+        }
+        
+        if (result.success) {
+          towersData = result.towers;
+          populateTowerLayout(result.towers);
+        } else {
+          document.getElementById('towerLayout').innerHTML = '<p style="text-align:center;color:var(--error)">Error loading towers</p>';
+        }
+      } catch (error) {
+        console.error('Error loading towers:', error);
+        document.getElementById('towerLayout').innerHTML = `
+          <div style="text-align:center;padding:40px 20px;">
+            <p style="color:var(--error);font-size:1.1rem;margin-bottom:20px;">
+              <i class="fas fa-exclamation-triangle"></i><br><br>
+              Unable to connect to server
+            </p>
+            <p style="color:var(--text-muted);font-size:0.95rem;">
+              ${error.message || (error.name === 'AbortError' ? 'Connection timeout' : 'Network error')}
+            </p>
+            <button class="btn btn-primary" onclick="loadTowers()" style="margin-top:20px">
+              <i class="fas fa-sync"></i> Retry
+            </button>
+          </div>
+        `;
+      }
+    }
+    
+    async function loadCollectTowers() {
+      try {
+        const res = await fetch(`${API_BASE}?action=get_towers`);
+        const data = await res.json();
+    
+        const layout = document.getElementById('collectTowerLayout');
+        layout.innerHTML = '';
+    
+        if (data.success) {
+          data.towers.forEach(tower => {
+            const btn = document.createElement('button');
+            btn.className = 'flat-btn';
+            btn.innerHTML = `
+              <div class="flat-num">${tower.tower_name}</div>
+              <div class="flat-label">${tower.society_name}</div>
+            `;
+            btn.onclick = () => selectCollectTower(tower);
+            layout.appendChild(btn);
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('collectTowerLayout').innerHTML =
+          '<p style="text-align:center;color:red">Unable to load towers</p>';
+      }
+    }
+    
+    function selectCollectTower(tower) {
+      selectedTower = tower.id;
+      selectedTowerName = tower.tower_name;
+      playSound(600, 0.05);
+      cacheTimestamp = 0;
+      
+      setTimeout(() => {
+        showScreen('collectStep1');
+        loadActiveDeliveryFlats(tower.id, tower.tower_name);
+      }, 500);
+    }
+
+    function populateTowerLayout(towers) {
+      const layout = document.getElementById('towerLayout');
+      layout.innerHTML = '';
+      
+      towers.forEach(tower => {
+        const btn = document.createElement('button');
+        btn.className = 'flat-btn';
+        btn.type = 'button';
+        btn.innerHTML = `
+          <div class="flat-num">${tower.tower_name}</div>
+          <div class="flat-label">${tower.society_name}</div>
+        `;
+        btn.onclick = () => selectTower(tower, btn);
+        layout.appendChild(btn);
+      });
+    }
+
+    function selectTower(tower, btnElement) {
+      document.querySelectorAll('#towerLayout .flat-btn').forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+      selectedTower = tower.id;
+      selectedTowerName = tower.tower_name;
+      playSound(600, 0.05);
+      
+      setTimeout(() => {
+        loadFlatsForTower(tower.id);
+      }, 1000);
+    }
+
+    async function loadFlatsForTower(locationId) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(`${API_BASE}?action=get_flats&location_id=${locationId}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        const text = await response.text();
+        let result;
+        
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error('API Response (not JSON):', text);
+          throw new Error('Server returned invalid response. Check console for details.');
+        }
+        
+        if (result.success) {
+          flatsData = result.flats;
+          populateBuildingLayout(result.flats);
+          showScreen('deliverStep2');
+          
+          setTimeout(() => {
+            const buildingLayout = document.getElementById('buildingLayout');
+            if (buildingLayout) {
+              buildingLayout.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 300);
+        } else {
+          document.getElementById('buildingLayout').innerHTML = '<p style="text-align:center;color:var(--error)">Error loading apartments</p>';
+        }
+      } catch (error) {
+        console.error('Error loading flats:', error);
+        document.getElementById('buildingLayout').innerHTML = `
+          <div style="text-align:center;padding:40px 20px;">
+            <p style="color:var(--error);font-size:1.1rem;margin-bottom:20px;">
+              <i class="fas fa-exclamation-triangle"></i><br><br>
+              Unable to connect to server
+            </p>
+            <p style="color:var(--text-muted);font-size:0.95rem;">
+              ${error.message || (error.name === 'AbortError' ? 'Connection timeout' : 'Network error')}
+            </p>
+            <button class="btn btn-primary" onclick="loadFlatsForTower(${locationId})" style="margin-top:20px">
+              <i class="fas fa-sync"></i> Retry
+            </button>
+          </div>
+        `;
+        showScreen('deliverStep2');
+      }
+    }
+
+    async function loadActiveDeliveryFlats(locationId, towerName, forceRefresh = false) {
+      const layout = document.getElementById('collectBuildingLayout');
+      
+      layout.innerHTML = `
+        <div style="text-align:center;padding:40px 20px;">
+          <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--primary)"></i>
+          <p style="margin-top:20px;color:var(--text-muted)">Loading active deliveries...</p>
+        </div>
+      `;
+      
+      try {
+        const now = Date.now();
+        const cacheKey = `${locationId}_${towerName}`;
+        
+        if (!forceRefresh && 
+            activeDeliveriesCache[cacheKey] && 
+            (now - cacheTimestamp) < CACHE_DURATION) {
+          console.log('Using cached data');
+          populateCollectBuildingLayout(activeDeliveriesCache[cacheKey]);
+          return;
+        }
+        
+        const minDelay = 300;
+        const startTime = Date.now();
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        
+        const res = await fetch(
+          `${API_COLLECT}?action=get_active_flats&location_id=${locationId}&tower_name=${encodeURIComponent(towerName)}&_t=${now}`,
+          { 
+            signal: controller.signal,
+            cache: 'no-store'
+          }
+        );
+        clearTimeout(timeoutId);
+        
+        const data = await res.json();
+        
+        const elapsed = Date.now() - startTime;
+        if (elapsed < minDelay) {
+          await new Promise(resolve => setTimeout(resolve, minDelay - elapsed));
+        }
+    
+        if (data.success && data.flats && data.flats.length > 0) {
+          activeDeliveryFlats = data.flats;
+          activeDeliveriesCache[cacheKey] = data.flats;
+          cacheTimestamp = now;
+          
+          populateCollectBuildingLayout(data.flats);
+          
+          setTimeout(() => {
+            const collectLayout = document.getElementById('collectBuildingLayout');
+            if (collectLayout && collectLayout.children.length > 0) {
+              collectLayout.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 300);
+        } else {
+          layout.innerHTML = `
+            <div style="text-align:center;padding:40px 20px;">
+             <p style="text-align:center;color:var(--text-muted)">No active deliveries found</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error loading active deliveries:', err);
+        layout.innerHTML = `
+          <div style="text-align:center;padding:40px 20px;">
+            <p style="color:var(--error);font-size:1.1rem;margin-bottom:20px;">
+              <i class="fas fa-exclamation-triangle"></i><br><br>
+              Unable to load active deliveries
+            </p>
+            <p style="color:var(--text-muted);font-size:0.95rem;">
+              ${err.message || 'Network error'}
+            </p>
+            <button class="btn btn-primary" onclick="loadActiveDeliveryFlats(${locationId}, '${towerName}', true)" style="margin-top:20px">
+              <i class="fas fa-sync"></i> Retry
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function populateBuildingLayout(flats) {
+      const layout = document.getElementById('buildingLayout');
+      layout.innerHTML = '';
+      
+      flats.forEach(flat => {
+        const btn = document.createElement('button');
+        btn.className = 'flat-btn';
+        btn.type = 'button';
+        btn.innerHTML = `
+          <div class="flat-num">${flat}</div>
+          <div class="flat-label">Apartment</div>
+        `;
+        btn.onclick = () => selectFlat(flat, btn);
+        layout.appendChild(btn);
+      });
+    }
+
+    function populateCollectBuildingLayout(flats) {
+      const layout = document.getElementById('collectBuildingLayout');
+      layout.innerHTML = '';
+      
+      if (!flats || flats.length === 0) {
+        layout.innerHTML = `
+          <div style="text-align:center;padding:40px 20px;">
+            <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem">No active deliveries found</p>
+            <p style="margin-top:10px;color:var(--text-muted);font-size:0.9rem">Packages will appear here once deposited</p>
+          </div>
+        `;
+        return;
+      }
+      
+      flats.forEach(flatObj => {
+        const flat = flatObj.flat_number || flatObj;
+        const tower = flatObj.tower_name || '';
+        const btn = document.createElement('button');
+        btn.className = 'flat-btn';
+        btn.type = 'button';
+        btn.innerHTML = `
+          <div class="flat-num">${flat}</div>
+          <div class="flat-label">${tower}</div>
+        `;
+        btn.onclick = () => selectCollectFlat(flat, btn);
+        layout.appendChild(btn);
+      });
+    }
+
+    function selectFlat(flat, btnElement) {
+      document.querySelectorAll('#buildingLayout .flat-btn').forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+      selectedFlat = flat;
+      document.getElementById('step2NextBtn').disabled = false;
+      playSound(600, 0.05);
+      
+      setTimeout(() => {
+        goToStep3();
+        setTimeout(() => {
+          const buttonGroup = document.getElementById('step2ButtonGroup');
+          if (buttonGroup) {
+            buttonGroup.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }, 300);
+      }, 1000);
+    }
+
+    function selectCollectFlat(flatNumber, element) {
+      selectedCollectFlat = flatNumber;
+      selectedResidentDetails = activeDeliveryFlats.find(f => f.flat_number === flatNumber);
+      
+      document.querySelectorAll('#collectBuildingLayout .flat-btn').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      document.getElementById('collectStep1NextBtn').disabled = false;
+      playSound(600, 0.05);
+      
+      setTimeout(() => {
+        goToCollectStep2();
+        setTimeout(() => {
+          const buttonGroup = document.querySelector('#collectStep2 .button-group');
+          if (buttonGroup) {
+            buttonGroup.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }, 300);
+      }, 1000);
+    }
+
+    async function goToStep3() {
+      if (!selectedFlat) {
+        console.error('No flat selected');
+        return;
+      }
+      
+      if (!selectedTower) {
+        console.error('No tower selected');
+        return;
+      }
+
+      console.log('goToStep3 called with:', {
+        selectedFlat: selectedFlat,
+        selectedTower: selectedTower,
+        selectedTowerName: selectedTowerName
+      });
+
+      document.getElementById('selectedTowerDisplay2').textContent = selectedTowerName;
+      document.getElementById('selectedFlatDisplay').textContent = selectedFlat;
+      document.getElementById('selectedTowerDisplay').textContent = selectedTowerName;
+
+      const residentDisplay = document.getElementById('selectedResidentNameDisplay');
+      
+      if (!residentDisplay) {
+        console.error('selectedResidentNameDisplay element not found in DOM');
+        return;
+      }
+
+      residentDisplay.textContent = "Loading...";
+      residentDisplay.style.color = "#666";
+      residentDisplay.style.fontStyle = "italic";
+
+      try {
+        const formData = new FormData();
+        formData.append('action', 'get_resident_name');
+        formData.append('location_id', selectedTower);
+        formData.append('flat_number', selectedFlat);
+
+        console.log('Fetching resident name with:', {
+          action: 'get_resident_name',
+          location_id: selectedTower,
+          flat_number: selectedFlat
+        });
+
+        const response = await fetch('api/deposit_delivery.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        console.log('Response status:', response.status);
+
+        const text = await response.text();
+        console.log('Raw response:', text);
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          console.error('JSON parse error:', e);
+          console.error('Response text:', text);
+          throw new Error('Invalid JSON response from server');
+        }
+
+        console.log('Parsed data:', data);
+
+        if (data.success && data.full_name) {
+          residentDisplay.textContent = data.full_name;
+          residentDisplay.style.color = "#1a1a2e";
+          residentDisplay.style.fontStyle = "normal";
+          residentDisplay.style.fontWeight = "600";
+          
+          if (typeof playSound === 'function') {
+            playSound(800, 0.1);
+          }
+          
+          console.log('Resident name loaded successfully:', data.full_name);
+        } else {
+          residentDisplay.textContent = "Resident Not Found";
+          residentDisplay.style.color = "#e74c3c";
+          residentDisplay.style.fontStyle = "normal";
+          residentDisplay.style.fontWeight = "600";
+          
+          console.error('Resident not found:', data);
+        }
+      } catch (error) {
+        console.error('Error fetching resident name:', error);
+        residentDisplay.textContent = "Error Loading Name";
+        residentDisplay.style.color = "#e74c3c";
+        residentDisplay.style.fontStyle = "normal";
+        residentDisplay.style.fontWeight = "600";
+      }
+
+      loadLockerAvailability(selectedTower);
+      showScreen('deliverStep3');
+
+      setTimeout(() => {
+        const sizeSection = document.getElementById('sizeSection');
+        if (sizeSection) {
+          sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+
+    async function goToCollectStep2() {
+      if (!selectedCollectFlat) return;
+
+      document.getElementById('selectedCollectFlatDisplay').textContent = selectedCollectFlat;
+      document.getElementById('otpInput').value = '';
+      showScreen('collectStep2');
+
+      const nameField = document.getElementById('collectResidentName');
+      const mobileField = document.getElementById('collectMobile');
+
+      if (selectedResidentDetails) {
+        nameField.value = selectedResidentDetails.full_name || '';
+        mobileField.value = selectedResidentDetails.mobile || '';
+
+        nameField.readOnly = true;
+        mobileField.readOnly = true;
+        nameField.style.background = '#f8f9fa';
+        mobileField.style.background = '#f8f9fa';
+        
+        speak("Details loaded. Please enter your O T P.");
+        
+        setTimeout(() => {
+          const otpField = document.getElementById('otpInput');
+          otpField.focus();
+          otpField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+
+        if (typeof playSound === 'function') playSound(800, 0.1); 
+
+      } else {
+        console.warn('Resident details not found in local memory, allowing manual entry.');
+        
+        nameField.value = '';
+        mobileField.value = '';
+        nameField.placeholder = 'Enter your full name';
+        mobileField.placeholder = 'Enter mobile number';
+        
+        nameField.readOnly = false;
+        mobileField.readOnly = false;
+        nameField.style.background = '#fff';
+        mobileField.style.background = '#fff';
+        
+        speak("Please enter your name, mobile number, and O T P.");
+      }
+    }
+
+    async function loadLockerAvailability(locationId) {
+      try {
+        const response = await fetch(`/keyless/api/locker_status.php?location_id=${locationId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          lockerAvailability = data.availability;
+          updateAvailabilityDisplay();
+        } else {
+          console.error('Failed to load availability:', data.message);
+          showAvailabilityError();
+        }
+      } catch (error) {
+        console.error('Error loading availability:', error);
+        showAvailabilityError();
+      }
+    }
+    
+    function updateAvailabilityDisplay() {
+      const sizes = ['small', 'medium', 'large'];
+  
+      sizes.forEach(size => {
+        const data = lockerAvailability[size] || { available: 0, total: 0 };
+        const badge = document.getElementById(`${size}-availability`);
+        const button = document.getElementById(`size-${size}-btn`);
+    
+        if (!badge || !button) return;
+    
+        const available = data.available;
+        const total = data.total;
+        
+        badge.innerHTML = '';
+        
+        let statusClass = 'unavailable';
+        let icon = 'fa-times-circle';
+        let text = 'Not Available';
+        
+        if (available > 0) {
+          if (available >= 2) {
+            statusClass = 'available';
+            icon = 'fa-check-circle';
+            text = `${available} Available`;
+          } else {
+            statusClass = 'limited';
+            icon = 'fa-exclamation-circle';
+            text = `${available} Left`;
+          }
+          button.classList.add('has-availability');
+          button.disabled = false;
+        } else {
+          button.classList.remove('has-availability');
+          button.disabled = true;
+        }
+        
+        badge.className = `availability-badge ${statusClass}`;
+        badge.innerHTML = `<i class="fas ${icon}"></i> ${text}`;
+      });
+    }
+
+    function showAvailabilityError() {
+      const sizes = ['small', 'medium', 'large'];
+      
+      sizes.forEach(size => {
+        const badge = document.getElementById(`${size}-availability`);
+        if (badge) {
+          badge.className = 'availability-badge unavailable';
+          badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error loading';
+        }
+      });
+    }
+
+    function selectSize(size, btnElement) {
+      const sizeData = lockerAvailability[size];
+      
+      if (!sizeData || sizeData.available === 0) {
+        playErrorSound();
+        speak(`Sorry, no ${size} lockers are currently available`);
+        
+        btnElement.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+          btnElement.style.animation = '';
+        }, 500);
+        
+        return;
+      }
+      
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+      selectedPackageSize = size;
+      document.getElementById('packageSize').value = size;
+      playSound(650, 0.05);
+      
+      setTimeout(() => {
+        document.getElementById('trackingSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }
+    
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      previousScreen = currentScreen;
+      currentScreen = screenId;
+      
+      if (screenId === 'collectTowerScreen') {
+        loadCollectTowers();
+      }
+      
+      if (autoRedirectTimeout) {
+        clearTimeout(autoRedirectTimeout);
+        autoRedirectTimeout = null;
+      }
+      
+      if (screenId === 'successScreen' || screenId === 'errorScreen' || screenId === 'lockerOpenedScreen') {
+        autoRedirectTimeout = setTimeout(() => {
+          showScreen('menuScreen');
+        }, 10000);
+      }
+      
+      if (screenId === 'menuScreen') {
+        resetForms();
+        cacheTimestamp = 0;
+        activeDeliveriesCache = {};
+      }
+    }
+
+    function goBack() {
+      showScreen(previousScreen);
+    }
+
+    function resetForms() {
+      document.getElementById('step2Form').reset();
+      document.getElementById('collectForm').reset();
+      document.getElementById('step2NextBtn').disabled = true;
+      document.getElementById('collectStep1NextBtn').disabled = true;
+      document.querySelectorAll('.flat-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.company-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelector('.company-btn[data-company="Amazon"]')?.classList.add('selected');
+      selectedTower = null;
+      selectedTowerName = '';
+      selectedFlat = '';
+      selectedCollectFlat = '';
+      selectedPackageSize = '';
+      selectedDeliveryCompany = 'Amazon';
+      if (autoRedirectTimeout) {
+        clearTimeout(autoRedirectTimeout);
+        autoRedirectTimeout = null;
+      }
+    }
+    
+    function selectCompany(company, btnElement) {
+      document.querySelectorAll('.company-btn').forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+      selectedDeliveryCompany = company;
+      document.getElementById('deliveryCompany').value = company;
+      playSound(650, 0.05);
+    }
+
+    document.getElementById('step2Form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!selectedPackageSize) {
+        document.getElementById('errorMessage').textContent = 'Please select a package size';
+        showScreen('errorScreen');
+        playErrorSound();
+        return;
+      }
+      
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      
+      const formData = new FormData();
+      formData.append('action', 'deposit');
+      formData.append('flat_number', selectedFlat);
+      formData.append('package_size', selectedPackageSize);
+      formData.append('tracking_number', document.getElementById('trackingNumber').value);
+      formData.append('delivery_company', selectedDeliveryCompany);
+      formData.append('location_id', selectedTower);
+
+      try {
+        const response = await fetch(API_BASE, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          cacheTimestamp = 0;
+          activeDeliveriesCache = {};
+          
+          document.getElementById('successTitle').textContent = 'Package Deposited Successfully';
+          document.getElementById('successDetails').innerHTML = `
+            <p><strong>Locker Number:</strong> ${result.data.locker_number}</p>
+            <p><strong>Apartment:</strong> ${result.data.flat_number}</p>
+            <p><strong>Resident:</strong> ${result.data.resident_name}</p>  <!-- ADD THIS LINE -->
+            <p><strong>Package Size:</strong> ${result.data.package_size}</p>
+            <p><strong>Delivery Company:</strong> ${selectedDeliveryCompany}</p>
+            ${result.data.tracking_number ? `<p><strong>Tracking Number:</strong> ${result.data.tracking_number}</p>` : ''}
+            <p style="margin-top:20px;color:#27ae60;font-weight:700">
+              <i class="fas fa-check-circle"></i> Package deposited successfully. Resident has been notified via email with OTP.
+            </p>
+          `;
+          showScreen('successScreen');
+          
+          playSuccessSound();
+          speak(`Package deposited successfully in locker ${result.data.locker_number}. Resident has been notified via email.`);
+          
+          document.getElementById('step2Form').reset();
+          selectedPackageSize = '';
+        } else {
+          document.getElementById('errorMessage').textContent = result.message;
+          showScreen('errorScreen');
+          playErrorSound();
+          speak(`Error. ${result.message}`);
+        }
+      } catch (error) {
+        document.getElementById('errorMessage').textContent = 'Network error. Please try again.';
+        showScreen('errorScreen');
+        playErrorSound();
+        speak('Network error. Please try again.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+
+    document.getElementById('collectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+      
+      const mobile = document.getElementById('collectMobile').value.trim();
+      const otp = document.getElementById('otpInput').value.trim();
+      const residentName = document.getElementById('collectResidentName').value.trim();
+      
+      const selectedFlatData = activeDeliveryFlats.find(f => f.flat_number === selectedCollectFlat);
+      const locationId = selectedFlatData ? selectedFlatData.location_id : 1;
+      
+      const formData = new FormData();
+      formData.append('action', 'collect');
+      formData.append('mobile', mobile);
+      formData.append('otp', otp);
+      formData.append('flat_number', selectedCollectFlat);
+      formData.append('resident_name', residentName);
+      formData.append('location_id', locationId);
+    
+      try {
+        const response = await fetch(API_COLLECT, {
+          method: 'POST',
+          body: formData
+        });
+    
+        const result = await response.json();
+    
+        if (result.success) {
+          cacheTimestamp = 0;
+          activeDeliveriesCache = {};
+          
+          document.getElementById('openedLockerNumber').textContent = result.data.locker_number;
+          document.getElementById('openedApartment').textContent = selectedCollectFlat;
+          document.getElementById('openedLocation').textContent = result.data.location_name || 'Tower A';
+          document.getElementById('openedInstruction').textContent = 'Please proceed to collect your package from the locker. Collection confirmation has been sent to your email.';
+          showScreen('lockerOpenedScreen');
+          
+          playSuccessSound();
+          speak(`Collection request sent for locker ${result.data.locker_number}. Please proceed to collect your package.`);
+          
+          document.getElementById('collectForm').reset();
+        } else {
+          document.getElementById('errorMessage').textContent = result.message;
+          showScreen('errorScreen');
+          playErrorSound();
+          speak(`Error. ${result.message}`);
+        }
+      } catch (error) {
+        document.getElementById('errorMessage').textContent = 'Network error. Please try again.';
+        showScreen('errorScreen');
+        playErrorSound();
+        speak('Network error. Please try again.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+    document.getElementById('collectResidentName').addEventListener('blur', function() {
+      if (this.value.trim()) {
+        setTimeout(() => {
+          document.getElementById('collectMobile').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          document.getElementById('collectMobile').focus();
+        }, 300);
+      }
+    });
+
+    document.getElementById('collectMobile').addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '').slice(0, 10);
+      if (this.value.length === 10) {
+        setTimeout(() => {
+          document.getElementById('otpInput').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          document.getElementById('otpInput').focus();
+        }, 300);
+      }
+    });
+
+    document.getElementById('otpInput').addEventListener('focus', function() {
+      setTimeout(() => {
+        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 400);
+    });
+
+    document.getElementById('otpInput').addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '').slice(0, 6);
+      if (this.value.length === 6) {
+        setTimeout(() => {
+          const collectFormButtonGroup = document.querySelector('#collectForm .button-group');
+          if (collectFormButtonGroup) {
+            collectFormButtonGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 400);
+      }
+    });
+
+    document.querySelectorAll('.company-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        setTimeout(() => {
+          const buttonGroup = document.querySelector('#step2Form .button-group');
+          if (buttonGroup) {
+            buttonGroup.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }, 300);
+      });
+    });
+    let chatbotOpen = false;
+
+    function toggleChatbot() {
+        chatbotOpen = !chatbotOpen;
+        const container = document.getElementById('chatbotContainer');
+        const toggle = document.getElementById('chatbotToggle');
+        
+        if (chatbotOpen) {
+            container.classList.add('active');
+            toggle.classList.add('active');
+            toggle.innerHTML = '<i class="fas fa-times"></i>';
+            document.getElementById('chatbotInput').focus();
+        } else {
+            container.classList.remove('active');
+            toggle.classList.remove('active');
+            toggle.innerHTML = '<i class="fas fa-comments"></i>';
+        }
+    }
+    
+    function askQuestion(question) {
+        document.getElementById('chatbotInput').value = question;
+        sendChatMessage();
+    }
+    
+    function addChatMessage(text, isUser = false) {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        
+        // Remove welcome message
+        const welcome = messagesDiv.querySelector('.welcome-message');
+        if (welcome) {
+            welcome.remove();
+        }
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+        
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.innerHTML = text;
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(content);
+        messagesDiv.appendChild(messageDiv);
+        
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    function showTyping() {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot';
+        typingDiv.id = 'typingIndicator';
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.innerHTML = '<i class="fas fa-robot"></i>';
+        
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator';
+        indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+        
+        typingDiv.appendChild(avatar);
+        typingDiv.appendChild(indicator);
+        messagesDiv.appendChild(typingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    function removeTyping() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+    
+    function showQuickQuestions() {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const questionsDiv = document.createElement('div');
+        questionsDiv.className = 'quick-questions';
+        questionsDiv.style.marginTop = '12px';
+        
+        const questions = [
+            { text: '📦 Deposit Process', query: 'How do I deposit a package?' },
+            { text: '📭 Collection Process', query: 'How do I collect my package?' },
+            { text: '🔐 Forgot OTP', query: 'What if I forgot my OTP?' },
+            { text: '📏 Locker Sizes', query: 'What are the locker sizes?' }
+        ];
+        
+        questions.forEach(q => {
+            const btn = document.createElement('button');
+            btn.className = 'quick-question';
+            btn.textContent = q.text;
+            btn.onclick = () => askQuestion(q.query);
+            questionsDiv.appendChild(btn);
+        });
+        
+        messagesDiv.appendChild(questionsDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    async function sendChatMessage() {
+        const input = document.getElementById('chatbotInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        addChatMessage(message, true);
+        input.value = '';
+        
+        const sendBtn = document.getElementById('chatbotSend');
+        const chatInput = document.getElementById('chatbotInput');
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+        
+        showTyping();
+        
+        try {
+            // Send as JSON (NOT FormData) because chatbot.php expects JSON
+            const response = await fetch('chatbot/chatbot.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })  // ← This is correct for your backend
+            });
+            
+            const data = await response.json();
+            
+            removeTyping();
+            
+            if (data.success) {
+                addChatMessage(data.response, false);
+                
+                // Show quick questions after each response
+                setTimeout(() => {
+                    showQuickQuestions();
+                }, 500);
+            } else {
+                addChatMessage('Sorry, I encountered an error: ' + (data.error || 'Unknown error'), false);
+            }
+        } catch (error) {
+            removeTyping();
+            addChatMessage('Unable to connect. Please check your connection and try again.', false);
+            console.error('Error:', error);
+        } finally {
+            sendBtn.disabled = false;
+            chatInput.disabled = false;
+            chatInput.focus();
+        }
+    }
+    
+    // Enter key to send
+    document.getElementById('chatbotInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendChatMessage();
+        }
+    });
+  </script>
+</body>
+</html>

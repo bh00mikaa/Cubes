@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyless Cubes - Smart Parcel Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            color: #2d2d2d;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: #fff;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #fff;
+            padding: 1.5rem 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #6b6b6b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #2d2d2d;
+        }
+
+        .nav-cta {
+            background: #FDB913;
+            color: #2d2d2d;
+            padding: 0.8rem 1.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: #FCA311;
+            transform: translateY(-2px);
+        }
+
+        .hero {
+            margin-top: 80px;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            padding: 5rem 6%;
+            background: #fafafa;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2.8rem, 5vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 1.8rem;
+        }
+
+        .hero-content p {
+            font-size: 1.35rem;
+            color: #6b6b6b;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: #FDB913;
+            color: #2d2d2d;
+            padding: 1.2rem 2.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: #FCA311;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(253, 185, 19, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #2d2d2d;
+            padding: 1.2rem 2.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid #d1d1d1;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #2d2d2d;
+            background: #f5f5f5;
+        }
+
+        .stats {
+            padding: 5rem 6%;
+            background: #fff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3.8rem;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #6b6b6b;
+        }
+
+        .testimonial-section {
+            padding: 6rem 6%;
+            background: #fafafa;
+        }
+
+        .testimonial {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .testimonial-quote {
+            font-size: 1.75rem;
+            color: #2d2d2d;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .testimonial-author {
+            color: #6b6b6b;
+        }
+
+        .gallery-section, .features-section, .specs-section, .pricing-section, .investment-section {
+            padding: 6rem 6%;
+        }
+
+        .section-header {
+            max-width: 800px;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #6b6b6b;
+        }
+
+        /* New Gallery Layout Styles */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 4rem;
+            align-items: center;
+        }
+
+        .gallery-text {
+            padding: 2rem;
+        }
+
+        .gallery-text h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: #2d2d2d;
+        }
+
+        .gallery-text p {
+            font-size: 1.1rem;
+            color: #6b6b6b;
+            line-height: 1.8;
+        }
+
+        .gallery-image {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s;
+        }
+
+        .gallery-image:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 968px) {
+            .gallery-row {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .gallery-text {
+                order: 1;
+            }
+
+            .gallery-image {
+                order: 2;
+            }
+        }
+
+        .features-section {
+            background: #fff;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            max-width: 1300px;
+        }
+
+        .feature-card {
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #6b6b6b;
+            line-height: 1.7;
+        }
+
+        .specs-section {
+            background: #fafafa;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .spec-card {
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            transition: all 0.3s;
+        }
+
+        .spec-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .spec-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .spec-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .spec-detail:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #6b6b6b;
+        }
+
+        .spec-value {
+            color: #2d2d2d;
+            text-align: right;
+        }
+
+        .pricing-section {
+            background: #fafafa;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 3rem auto;
+        }
+
+        .pricing-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 3rem 2.5rem;
+            border: 1px solid #e5e5e5;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .pricing-card.featured {
+            border: 2px solid #FDB913;
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #FDB913;
+            color: #2d2d2d;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .pricing-period {
+            color: #6b6b6b;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.9rem 0;
+            color: #6b6b6b;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .pricing-features li::before {
+            content: "✓";
+            color: #4ade80;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .cta-section {
+            padding: 6rem 6%;
+            background: #2d2d2d;
+            text-align: center;
+            color: #fff;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            color: #d1d1d1;
+        }
+
+        footer {
+            background: #f5f5f5;
+            padding: 4rem 6% 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-col h4 {
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+        }
+
+        .footer-col p, .footer-col a {
+            color: #6b6b6b;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.6rem;
+        }
+
+        .footer-col a:hover {
+            color: #2d2d2d;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e5e5;
+            color: #6b6b6b;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Keyless Cubes</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#contact">Contact</a>
+            <a href="inquiry.html" class="nav-cta">Get Started</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Delightful to use, effortless to manage</h1>
+            <p>A powerful parcel management solution that adapts to the way your community works.</p>
+            <div class="hero-cta">
+                <a href="inquiry.html" class="btn-primary">Request Demo</a>
+                <a href="#features" class="btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">70%</div>
+                <div class="stat-label">Reduced guard workload</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Access anytime</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">90%</div>
+                <div class="stat-label">Fewer lost parcels</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">₹50</div>
+                <div class="stat-label">Monthly cost per flat</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonial-section">
+        <div class="testimonial">
+            <p class="testimonial-quote">"With Keyless Cubes, my work gets easier as I can focus on security duties and residents can collect their packages anytime without waiting for me."</p>
+        </div>
+    </section>
+
+        <section class="gallery-section">
+        <div class="section-header">
+            <h2>See Keyless Cubes in Action</h2>
+            <p>Modern, secure, and user-friendly parcel management for your community</p>
+        </div>
+        <div class="gallery-container">
+            <!-- First Row: Text + Image 1 -->
+            <div class="gallery-row">
+                <div class="gallery-text">
+                    <h3>Bright & Welcoming Design</h3>
+                    <p>Our modern locker system features a sleek, contemporary design that seamlessly complements your community's aesthetic. The vibrant yellow accents and clean lines create an inviting atmosphere, making package collection a pleasant experience for all residents.</p>
+                </div>
+                <div class="gallery-image">
+                    <img src="assets/images/image1.png" alt="Keyless Cubes Locker">
+                </div>
+            </div>
+
+            <!-- Second Row: Image 2 + Text -->
+            <div class="gallery-row">
+                <div class="gallery-image">
+                    <img src="assets/images/image2.png" alt="Professional Installation">
+                </div>
+                <div class="gallery-text">
+                    <h3>Professional Setup & Integration</h3>
+                    <p>Our expert installation team ensures seamless integration into your lobby space. The system is professionally mounted and configured to work perfectly with your existing infrastructure, minimizing disruption during setup.</p>
+                </div>
+            </div>
+
+            <!-- Third Row: Text + Image 3 -->
+            <div class="gallery-row">
+                <div class="gallery-text">
+                    <h3>Simple for Delivery Staff</h3>
+                    <p>Delivery personnel can quickly deposit packages using an intuitive touchscreen interface. The process takes less than 30 seconds, ensuring fast and efficient package handling while maintaining complete security protocols.</p>
+                </div>
+                <div class="gallery-image">
+                    <img src="assets/images/image3.png" alt="Easy Deposit">
+                </div>
+            </div>
+
+            <!-- Fourth Row: Image 4 + Text -->
+            <div class="gallery-row">
+                <div class="gallery-image">
+                    <img src="assets/images/image4.png" alt="Contactless Collection">
+                </div>
+                <div class="gallery-text">
+                    <h3>Contactless 24/7 Collection</h3>
+                    <p>Residents enjoy complete freedom to collect their packages at any time of day or night. The contactless system uses secure OTP authentication, eliminating the need to wait for guards or coordinate pickup times.</p>
+                </div>
+            </div>
+
+            <!-- Fifth Row: Text + Image 5 -->
+            <div class="gallery-row">
+                <div class="gallery-text">
+                    <h3>Secure Authentication System</h3>
+                    <p>Every transaction is protected by OTP-based authentication, ensuring only authorized residents can access their parcels. The system maintains a complete audit trail with timestamps for enhanced security and accountability.</p>
+                </div>
+                <div class="gallery-image">
+                    <img src="assets/images/image5.png" alt="Secure Authentication">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <h2>Multiple access methods to fit your community</h2>
+            <p>Wired and wireless locker lock options for any locker or cabinet</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Secure OTP Access</h3>
+                <p>Electromagnetic locks with OTP authentication ensure only authorized residents collect parcels. Complete audit trail with timestamps.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Cloud-Based Management</h3>
+                <p>Automatic updates every month. Integrations with your environment. >99.5% uptime guaranteed.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Time Savings</h3>
+                <p>More than 95% of time saved managing parcels. Up to 40% less floor space required.</p>
+            </div>
+            <div class="feature-card">
+                <h3>24/7 Availability</h3>
+                <p>Collect packages anytime - early morning, late night, weekends. No dependency on guard availability.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Smart Notifications</h3>
+                <p>Email and SMS alerts when packages arrive. Voice-guided pickup. Instant deposit confirmation.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Flexible Configuration</h3>
+                <p>Customizable locker sizes to match delivery patterns. Scalable as your community grows.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="specs-section">
+        <div class="section-header">
+            <h2>Technical Specifications</h2>
+            <p>Industrial-grade hardware built for 24/7 reliability</p>
+        </div>
+        <div class="specs-grid">
+            <div class="spec-card">
+                <h3>Standard Configuration</h3>
+                <div class="spec-detail">
+                    <span class="spec-label">Base Unit</span>
+                    <span class="spec-value">16 lockers</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Expansion</span>
+                    <span class="spec-value">8 lockers each</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Display</span>
+                    <span class="spec-value">15.6" Full HD touchscreen</span>
+                </div>
+            </div>
+            
+            <div class="spec-card">
+                <h3>Dimensions</h3>
+                <div class="spec-detail">
+                    <span class="spec-label">Height</span>
+                    <span class="spec-value">2100mm (7 feet)</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Width</span>
+                    <span class="spec-value">1200mm (4 feet)</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Depth</span>
+                    <span class="spec-value">600mm (2 feet)</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Weight</span>
+                    <span class="spec-value">~180 kg</span>
+                </div>
+            </div>
+
+            <div class="spec-card">
+                <h3>Locker Sizes</h3>
+                <div class="spec-detail">
+                    <span class="spec-label">Small (6 units)</span>
+                    <span class="spec-value">300×80×450mm</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Medium (8 units)</span>
+                    <span class="spec-value">300×150×450mm</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Large (2 units)</span>
+                    <span class="spec-value">300×300×450mm</span>
+                </div>
+            </div>
+
+            <div class="spec-card">
+                <h3>Power & Network</h3>
+                <div class="spec-detail">
+                    <span class="spec-label">Voltage</span>
+                    <span class="spec-value">220-240V AC, 50Hz</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Power</span>
+                    <span class="spec-value">150-200W</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Network</span>
+                    <span class="spec-value">Wi-Fi / Ethernet</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing-section" id="pricing">
+        <div class="section-header">
+            <h2>Software Subscription Plans</h2>
+            <p>Choose the plan that fits your community's needs</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Standard</h3>
+                <div class="pricing-price">₹12,000</div>
+                <div class="pricing-period">per year (1-year plan)</div>
+                <ul class="pricing-features">
+                    <li>Core parcel management</li>
+                    <li>Email notifications</li>
+                    <li>Basic reporting</li>
+                    <li>Web portal access</li>
+                    <li>Technical support</li>
+                </ul>
+                <a href="inquiry.html" class="btn-primary">Get Started</a>
+            </div>
+            <div class="pricing-card featured">
+                <div class="pricing-badge">Most Popular</div>
+                <h3>Premium</h3>
+                <div class="pricing-price">₹21,000</div>
+                <div class="pricing-period">total (2-year plan) - ₹10,500/year</div>
+                <ul class="pricing-features">
+                    <li>All Standard features</li>
+                    <li>SMS alerts included</li>
+                    <li>Advanced analytics</li>
+                    <li>Priority support</li>
+                    <li>Custom reports</li>
+                </ul>
+                <a href="inquiry.html" class="btn-primary">Get Started</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Enterprise</h3>
+                <div class="pricing-price">₹27,000</div>
+                <div class="pricing-period">total (3-year plan) - ₹9,000/year</div>
+                <ul class="pricing-features">
+                    <li>All Premium features</li>
+                    <li>API integration</li>
+                    <li>Custom reporting</li>
+                    <li>Dedicated manager</li>
+                    <li>White-label option</li>
+                </ul>
+                <a href="inquiry.html" class="btn-primary">Get Started</a>
+            </div>
+        </div>
+        
+        <div class="section-header" style="margin-top: 4rem;">
+            <h2>Hardware Investment (One-Time)</h2>
+            <p>Industrial-grade hardware built for longevity</p>
+        </div>
+        <div class="specs-grid">
+            <div class="spec-card">
+                <h3>Base Unit</h3>
+                <div class="spec-detail">
+                    <span class="spec-label">16 Lockers + PC</span>
+                    <span class="spec-value">₹80,000 - ₹95,000</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Installation</span>
+                    <span class="spec-value">₹8,000 - ₹12,000</span>
+                </div>
+            </div>
+            
+            <div class="spec-card">
+                <h3>Optional Add-ons</h3>
+                <div class="spec-detail">
+                    <span class="spec-label">Expansion (8 lockers)</span>
+                    <span class="spec-value">₹35,000 - ₹45,000</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">HD Camera</span>
+                    <span class="spec-value">₹8,000 - ₹12,000</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">4G Module</span>
+                    <span class="spec-value">₹6,000 - ₹10,000</span>
+                </div>
+            </div>
+
+            <div class="spec-card">
+                <h3>Warranty & Service</h3>
+                <div class="spec-detail">
+                    <span class="spec-label">6 Months Warranty</span>
+                    <span class="spec-value">FREE</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Free Service (1 year)</span>
+                    <span class="spec-value">Included</span>
+                </div>
+                <div class="spec-detail">
+                    <span class="spec-label">Annual Maintenance</span>
+                    <span class="spec-value">₹15,000/year</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Ready to transform your community?</h2>
+        <p>Contact us today for a personalised demonstration and implementation plan</p>
+        <a href="inquiry.html" class="btn-primary">Request Demo</a>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Keyless Cubes</h4>
+                <p>Smart parcel management for modern gated communities</p>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <a href="mailto:Keylesscubes@vistech.co.in">Keylesscubes@vistech.co.in</a>
+                <a href="tel:+917355028894">+91 73550 28894</a>
+                <a href="tel:+919871033311">+91 98710 33311</a>
+            </div>
+            <div class="footer-col">
+                <h4>Address</h4>
+                <p>Plot No. 341, Sector 7<br>IMT Manesar, Gurugram-122051<br>Haryana, India</p>
+            </div>
+            <div class="footer-col">
+                <h4>Website</h4>
+                <a href="https://vistech.co.in/keyless/" target="_blank">vistech.co.in/keyless/</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Keyless Cubes. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Keyless Cubes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1e3a5f;
+            --navy-light: #2d5a8f;
+            --white: #ffffff;
+            --bg-light: ##f1f8f3;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--white);
+            border: 2px solid var(--navy);
+            color: var(--navy);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background: var(--navy);
+            color: var(--white);
+            transform: translateX(-3px);
+        }
+
+        .back-button i {
+            font-size: 16px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .logo-placeholder i {
+            font-size: 36px;
+            color: var(--white);
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            color: var(--navy);
+            font-size: 16px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: var(--white);
+            color: var(--text-dark);
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--navy);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--navy);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 58, 95, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--navy);
+            border: 2px solid var(--navy);
+            margin-top: 12px;
+        }
+
+        .btn-outline:hover {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .btn-link {
+            background: none;
+            color: var(--navy);
+            padding: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            width: auto;
+            display: inline-flex;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .message.show {
+            display: flex;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #047857;
+            border: 1px solid #10b981;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .user-email {
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .link-group {
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .otp-input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .otp-box {
+            width: 50px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .otp-box:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.1);
+        }
+
+        small {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .forgot-header h2,
+        .password-header h2,
+        .otp-header h2 {
+            font-size: 24px;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .forgot-header p,
+        .password-header p,
+        .otp-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 480px) {
+            .back-button {
+                top: 10px;
+                left: 10px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .login-card {
+                padding: 30px 24px;
+            }
+
+            .logo-placeholder {
+                width: 70px;
+                height: 70px;
+            }
+
+            .logo-placeholder i {
+                font-size: 30px;
+            }
+
+            .login-header h1 {
+                font-size: 24px;
+            }
+
+            .otp-box {
+                width: 45px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Kiosk Button -->
+    <button class="back-button" onclick="goBackToKiosk()">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Kiosk</span>
+    </button>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-placeholder">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <h1>Keyless Cubes</h1>
+                <p>Admin Dashboard Login</p>
+            </div>
+
+            <!-- Step 1: Username Check -->
+            <form id="usernameForm" class="login-form active">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        Username
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span>Continue</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Step 2: Password Login -->
+            <form id="passwordForm" class="login-form">
+                <div class="password-header">
+                    <h2>Welcome Back</h2>
+                    <p>Login as <span id="passwordUsername" class="user-email"></span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <div class="input-wrapper password-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                        <button type="button" class="password-toggle" data-target="password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span>Sign In</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                </button>
+                
+                <div class="link-group">
+                    <button type="button" id="forgotPasswordBtn" class="btn btn-link">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Forgot Password?</span>
+                    </button>
+                    <button type="button" id="backToUsername" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Step 3: Forgot Password - Send OTP -->
+            <form id="forgotPasswordForm" class="login-form">
+                <div class="forgot-header">
+                    <h2>Reset Password</h2>
+                    <p>We'll send a 6-digit code to your registered email</p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span>Send Verification Code</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button type="button" id="backToPassword" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Login</span>
+                </button>
+            </form>
+
+            <!-- Step 4: Reset Password with OTP -->
+            <form id="resetPasswordForm" class="login-form">
+                <div class="otp-header">
+                    <h2>Reset Your Password</h2>
+                    <p>Enter the code sent to your email and create a new password</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resetOtp">
+                        <i class="fas fa-shield-alt"></i>
+                        Verification Code
+                    </label>
+                    <div class="otp-input-group">
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" />
+                    </div>
+                    <input type="hidden" id="resetOtp" name="otp" />
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">
+                        <i class="fas fa-lock"></i>
+                        New Password
+                    </label>
+                    <div class="input-wrapper password-wrapper">
+                        <input type="password" id="newPassword" name="new_password" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password">
+                        <button type="button" class="password-toggle" data-target="newPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmNewPassword">
+                        <i class="fas fa-lock"></i>
+                        Confirm Password
+                    </label>
+                    <div class="input-wrapper password-wrapper">
+                        <input type="password" id="confirmNewPassword" name="confirm_password" placeholder="Re-enter password" required autocomplete="new-password">
+                        <button type="button" class="password-toggle" data-target="confirmNewPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span>Reset Password</span>
+                    <i class="fas fa-check"></i>
+                </button>
+                <button type="button" id="backToForgot" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'api';
+        let currentUsername = '';
+        let currentEmail = '';
+
+        // Back to Kiosk function
+        function goBackToKiosk() {
+            window.location.href = 'residence.html';
+        }
+
+        // OTP input handling
+        document.addEventListener("DOMContentLoaded", function () {
+            const otpInputs = document.querySelectorAll(".otp-box");
+            const hiddenInput = document.getElementById("resetOtp");
+
+            otpInputs.forEach((input, index) => {
+                input.addEventListener("input", function (e) {
+                    this.value = this.value.replace(/[^0-9]/g, "");
+                    if (this.value && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                    updateHiddenInput();
+                });
+
+                input.addEventListener("keydown", function (e) {
+                    if (e.key === "Backspace" && !this.value && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+            });
+
+            function updateHiddenInput() {
+                if (hiddenInput) {
+                    hiddenInput.value = Array.from(otpInputs).map(i => i.value).join("");
+                }
+            }
+        });
+
+        // Password toggle
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.password-toggle')) {
+                const button = e.target.closest('.password-toggle');
+                const targetId = button.dataset.target;
+                const input = document.getElementById(targetId);
+                const icon = button.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        });
+
+        // Show message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type} show`;
+            setTimeout(() => {
+                messageDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // Show form
+        function showForm(formId) {
+            document.querySelectorAll('.login-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(formId).classList.add('active');
+        }
+
+        // Step 1: Check username
+        document.getElementById('usernameForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'check_admin');
+                formData.append('username', username);
+                
+                const response = await fetch(`${API_BASE}/admin_auth.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.admin_exists) {
+                        currentUsername = username;
+                        currentEmail = result.email;
+                        document.getElementById('passwordUsername').textContent = username;
+                        showForm('passwordForm');
+                    } else {
+                        showMessage('Admin account not found. Please contact your administrator.', 'error');
+                    }
+                } else {
+                    showMessage(result.message || 'Error checking username', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        // Step 2: Login with password
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('username', currentUsername);
+                formData.append('password', password);
+                
+                const response = await fetch(`${API_BASE}/admin_auth.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
+                } else {
+                    showMessage(result.message || 'Invalid password', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        // Step 3: Send reset OTP
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'send_reset_otp');
+                formData.append('username', currentUsername);
+                
+                const response = await fetch(`${API_BASE}/admin_auth.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Verification code sent to your email!', 'success');
+                    setTimeout(() => {
+                        showForm('resetPasswordForm');
+                    }, 1500);
+                } else {
+                    showMessage(result.message || 'Failed to send code', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        // Step 4: Reset password with OTP
+        document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const otp = document.getElementById('resetOtp').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                showMessage('Passwords do not match!', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'reset_password_with_otp');
+                formData.append('username', currentUsername);
+                formData.append('otp', otp);
+                formData.append('new_password', newPassword);
+                
+                const response = await fetch(`${API_BASE}/admin_auth.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Password reset successful! Please login.', 'success');
+                    setTimeout(() => {
+                        showForm('usernameForm');
+                        document.getElementById('usernameForm').reset();
+                        document.getElementById('passwordForm').reset();
+                        document.getElementById('resetPasswordForm').reset();
+                    }, 2000);
+                } else {
+                    showMessage(result.message || 'Failed to reset password', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        // Navigation buttons
+        document.getElementById('backToUsername').addEventListener('click', () => {
+            showForm('usernameForm');
+            document.getElementById('passwordForm').reset();
+        });
+
+        document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
+            showForm('forgotPasswordForm');
+        });
+
+        document.getElementById('backToPassword').addEventListener('click', () => {
+            showForm('passwordForm');
+        });
+
+        document.getElementById('backToForgot').addEventListener('click', () => {
+            showForm('forgotPasswordForm');
+            document.getElementById('resetPasswordForm').reset();
+        });
+    </script>
+</body>
+</html>
