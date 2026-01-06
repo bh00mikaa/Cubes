@@ -34,8 +34,8 @@ if (!isset($data['message']) || empty(trim($data['message']))) {
 
 $userMessage = trim($data['message']);
 
-// Your NEW Gemini API Key
-$apiKey = 'AIzaSyDdvIIvzB_VGCYaS7Fug1QVGs3POuRLJNw';
+// Your  Gemini API Key
+$apiKey = 'API';
 
 // Professional system context with bullet points
 $systemContext = "You are a professional AI assistant for Keyless Cubes, a smart package locker management system.
